@@ -1,14 +1,16 @@
 # Atividade 1 – S3 (LocalStack)
 
 ```bash
-cd atv1-amazons3
 docker compose up -d
+cd atv1-amazons3
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python app.py
 ```
 
-Abrir http://localhost:8001 → escolher uma imagem → Enviar → ver na lista e clicar em Download.
+http://localhost:8001/imagens (exige login pela atividade 2, em http://localhost:8002/login)
 
-Para desligar: `Ctrl+C` e `docker compose down`
+```bash
+docker compose down
+```

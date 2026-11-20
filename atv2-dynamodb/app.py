@@ -1,6 +1,6 @@
 import hashlib
 import boto3
-from flask import Flask, redirect, render_template, request
+from flask import Flask, redirect, render_template, request, session
 
 db = boto3.resource("dynamodb", endpoint_url="http://localhost:4566", region_name="us-east-1",
                     aws_access_key_id="test", aws_secret_access_key="test")
@@ -17,6 +17,7 @@ def hash_senha(s):
     return hashlib.sha256(s.encode()).hexdigest()
 
 app = Flask(__name__, template_folder="..")  # usa o index.html da raiz do repositorio
+app.secret_key = "localstack-demo"            # mesma chave da atividade 1: compartilha o login
 
 @app.route("/")
 def inicio():
@@ -38,12 +39,8 @@ def login():
                                msg=f"Conta criada para {criado}. Faça login." if criado else "")
     item = tabela.get_item(Key={"email": request.form["email"]}).get("Item")
     if item and item["senha"] == hash_senha(request.form["senha"]):
-        # depois: trocar por redirect para a pagina de upload (atividade 1)
-        return redirect(f"/bem-vindo?nome={item['nome']}")
+        session["usuario"] = item["nome"]
+        return redirect("http://localhost:8001/imagens")  # pagina de imagens (atividade 1)
     return render_template("index.html", pagina="login", erro="Email ou senha inválidos")
-
-@app.route("/bem-vindo")
-def bem_vindo():
-    return render_template("index.html", pagina="logado", nome=request.args.get("nome", ""))
 
 app.run(port=8002, debug=True)
